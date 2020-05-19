@@ -2,8 +2,42 @@ final int MENU_STATE = 0;
 final int GAME_STATE = 1;
 final int PAUSED_STATE = 2;
 final int VICTORY_STATE = 3;
+final int DEFEAT_STATE = 4;
 
 int currentState = MENU_STATE;
+
+// Ball
+final int BALL_SIZE = 20;
+final int HALF_BALL_SIZE = BALL_SIZE / 2;
+
+int ballX;
+int ballY;
+int ballDX = 10;
+int ballDY = 10;
+
+// Score
+
+final int SCORE_TEXT_SIZE = 50;
+final int SCORE_MARGIN_TOP = 50;
+final int SCORE_MARGIN_SIDES = 70;
+
+int rightPlayerScore = 0;
+int leftPlayerScore = 0;
+
+// Paddles
+
+final int PADDLES_WIDTH = 50;
+final int PADDLES_HEIGHT = 120;
+final int PADDLES_HALF_WIDTH = PADDLES_WIDTH / 2;
+final int PADDLES_HALF_HEIGHT = PADDLES_HEIGHT / 2;
+
+int leftPaddleX;
+int leftPaddleY;
+int leftPaddleDY = 7;
+
+int rightPaddleX;
+int rightPaddleY;
+int rightPaddleDY = 7;
 
 void setup() {
   fullScreen();
@@ -19,74 +53,19 @@ void setup() {
   leftPaddleY = rightPaddleY = height / 2;
 }
 
-void draw() {
-  // Ball
-
-  background(0);
-  fill(0xFF00F712);
-  ellipse(ballX, ballY, BALL_SIZE, BALL_SIZE);
-
-  ballX -= ballDX;
-  ballY -= ballDY;
-
-  if (ballX - HALF_BALL_SIZE >= width) {
-    leftPlayerScore++;
-    ballX = width / 2;
-    ballY = height / 2;
-    ballDX *= -1;
+void draw() { 
+  switch (currentState) {
+  case MENU_STATE:
+    drawMenu();
+    break;
+  case GAME_STATE:
+    drawGame();
+    break;
+  case PAUSED_STATE:
+    drawPause();
+    break;
+  case VICTORY_STATE:
+    drawVictory();
+    break;
   }
-
-  if (ballX + HALF_BALL_SIZE < 0) {
-    rightPlayerScore++; 
-    ballX = width / 2;
-    ballY = height / 2;
-    ballDX *= -1;
-  }
-
-  if (ballY + HALF_BALL_SIZE >= height || ballY - HALF_BALL_SIZE < 0) {
-    ballDY *= -1;
-  }
-
-  // Paddles
-
-  rect(rightPaddleX, rightPaddleY, PADDLES_WIDTH, PADDLES_HEIGHT);
-  rect(leftPaddleX, leftPaddleY, PADDLES_WIDTH, PADDLES_HEIGHT);
-
-  if (keyPressed) {
-    if (keyCode == UP) {
-      leftPaddleY -= leftPaddleDY;
-      rightPaddleY -= rightPaddleDY;
-      if (leftPaddleY - PADDLES_HALF_HEIGHT < 0) {
-        leftPaddleY = PADDLES_HALF_HEIGHT;
-      }
-      if (rightPaddleY - PADDLES_HALF_HEIGHT < 0) { // Второй игрок/компьтер
-        rightPaddleY = PADDLES_HALF_HEIGHT;
-      }
-    } else if (keyCode == DOWN) {
-      leftPaddleY += leftPaddleDY;
-      rightPaddleY += rightPaddleDY;
-      if (leftPaddleY + PADDLES_HALF_HEIGHT > height) {
-        leftPaddleY = height - PADDLES_HALF_HEIGHT;
-      }
-      if (rightPaddleY + PADDLES_HALF_HEIGHT > height) { // Второй игрок/компьтер
-        rightPaddleY = height - PADDLES_HALF_HEIGHT;
-      }
-    }
-  }
-
-  // Collision Detection
-
-  if (abs(ballX - leftPaddleX) < HALF_BALL_SIZE + PADDLES_HALF_WIDTH &&
-    abs(ballY - leftPaddleY) < HALF_BALL_SIZE + PADDLES_HALF_WIDTH ||
-    abs(ballX - rightPaddleX) < HALF_BALL_SIZE + PADDLES_HALF_WIDTH &&
-    abs(ballY - rightPaddleY) < HALF_BALL_SIZE + PADDLES_HALF_WIDTH) {
-    ballDX *= -1;
-  }
-
-  // Score
-
-  textSize(SCORE_TEXT_SIZE);
-  textAlign(CENTER, CENTER);
-  text(leftPlayerScore, SCORE_MARGIN_SIDES, SCORE_MARGIN_TOP);
-  text(rightPlayerScore, width - SCORE_MARGIN_SIDES, SCORE_MARGIN_TOP);
 }
